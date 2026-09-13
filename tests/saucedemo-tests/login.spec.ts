@@ -18,6 +18,16 @@ test("should load login page with title and form controls", async ({
   await expect(page.getByRole("button", { name: /Login/ })).toBeVisible();
 });
 
+test("should display error message for empty username and password", async ({
+  page,
+}) => {
+  await page.goto("https://www.saucedemo.com/");
+  await page.getByRole("button", { name: /Login/ }).click();
+  await expect(
+    page.getByText(/Epic sadface: Username is required/),
+  ).toBeVisible();
+});
+
 test("should log in a valid user with correct credentials", async ({
   page,
 }) => {
