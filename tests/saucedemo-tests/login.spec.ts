@@ -8,7 +8,7 @@ const users: UserDataFile = JSON.parse(
   fs.readFileSync(path.resolve(__dirname, "../../data/users.json"), "utf-8"),
 );
 
-test.describe("go to saucedemo.com", () => {
+test.describe("go to saucedemo page, check login functionality", () => {
   let loginPage: LoginPage;
   test.beforeEach(async ({ page }) => {
     loginPage = new LoginPage(page);
@@ -19,7 +19,6 @@ test.describe("go to saucedemo.com", () => {
     page,
   }) => {
     await expect(page).toHaveTitle(/Swag Labs/);
-
     await expect(page.getByPlaceholder(/Username/)).toBeVisible();
     await expect(page.getByPlaceholder(/Password/)).toBeVisible();
     await expect(page.getByRole("button", { name: /Login/ })).toBeVisible();
@@ -37,17 +36,16 @@ test.describe("go to saucedemo.com", () => {
   test("should log in a valid user with correct credentials", async ({
     page,
   }) => {
-    await page.getByPlaceholder(/Username/).fill(users.validUsers[0].username);
-    await page.getByPlaceholder(/Password/).fill(users.validUsers[0].password);
-    await page.getByRole("button", { name: /Login/ }).click();
+    loginPage = new LoginPage(page);
+    const validUser: TestUser = users.validUsers[0];
+    await loginPage.login(validUser.username, validUser.password);
     await expect(page).toHaveURL(/.*inventory.html/);
   });
 
   test("should not log in an invalid user", async ({ page }) => {
     for (const invalidUser of users.invalidUsers) {
-      await page.getByPlaceholder(/Username/).fill(invalidUser.username);
-      await page.getByPlaceholder(/Password/).fill(invalidUser.password);
-      await page.getByRole("button", { name: /Login/ }).click();
+      loginPage = new LoginPage(page);
+      await loginPage.login(invalidUser.username, invalidUser.password);
       await expect(page.getByText(invalidUser.expectedError!)).toBeVisible();
     }
   });
