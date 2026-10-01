@@ -19,24 +19,21 @@ test.describe("go to saucedemo page, check login functionality", () => {
     page,
   }) => {
     await expect(page).toHaveTitle(/Swag Labs/);
-    await expect(page.getByPlaceholder(/Username/)).toBeVisible();
-    await expect(page.getByPlaceholder(/Password/)).toBeVisible();
-    await expect(page.getByRole("button", { name: /Login/ })).toBeVisible();
+    await expect(loginPage.usernameInput).toBeVisible();
+    await expect(loginPage.passwordInput).toBeVisible();
+    await expect(loginPage.loginButton).toBeVisible();
   });
 
-  test("should display error message for empty username and password", async ({
-    page,
-  }) => {
-    await page.getByRole("button", { name: /Login/ }).click();
-    await expect(
-      page.getByText(/Epic sadface: Username is required/),
-    ).toBeVisible();
+  test("should display error message for empty username and password", async () => {
+    await loginPage.loginButton.click();
+    await expect(loginPage.errorMessage).toHaveText(
+      /Epic sadface: Username is required/,
+    );
   });
 
   test("should log in a valid user with correct credentials", async ({
     page,
   }) => {
-    loginPage = new LoginPage(page);
     const validUser: TestUser = users.validUsers[0];
     await loginPage.login(validUser.username, validUser.password);
     await expect(page).toHaveURL(/.*inventory.html/);
@@ -44,7 +41,6 @@ test.describe("go to saucedemo page, check login functionality", () => {
 
   test("should not log in an invalid user", async ({ page }) => {
     for (const invalidUser of users.invalidUsers) {
-      loginPage = new LoginPage(page);
       await loginPage.login(invalidUser.username, invalidUser.password);
       await expect(page.getByText(invalidUser.expectedError!)).toBeVisible();
     }
