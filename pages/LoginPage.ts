@@ -12,7 +12,7 @@ export class LoginPage {
     this.usernameInput = page.getByPlaceholder(/Username/i);
     this.passwordInput = page.getByPlaceholder(/Password/i);
     this.loginButton = page.getByRole("button", { name: /Login/i });
-    this.errorMessage = page.getByTestId("error-message-container");
+    this.errorMessage = page.getByRole("alert");
   }
 
   async navigateToLoginPage() {
